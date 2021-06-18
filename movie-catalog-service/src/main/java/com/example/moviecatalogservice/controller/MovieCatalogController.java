@@ -31,17 +31,18 @@ public class MovieCatalogController {
     @GetMapping("/{id}")
     public List<CatalogItem> getCatalog(@PathVariable("id") int userID){
 
-        UserRating ratings = restTemplate.getForObject("http://localhost:8083//ratings-data/users/" + userID, UserRating.class);
+        UserRating ratings = restTemplate.getForObject("http://ratings-data-service//ratings-data/users/" + userID, UserRating.class);
 
         return ratings.getRatings().stream().map(rating -> {
             //Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
 
-            Movie movie = webClientBuilder.build()
-                    .get()
-                    .uri("http://localhost:8082/movies/" + rating.getMovieId())
-                    .retrieve()
-                    .bodyToMono(Movie.class)
-                    .block();
+//            Movie movie = webClientBuilder.build()
+//                    .get()
+//                    .uri("http://movie-info-service//movies/" + rating.getMovieId())
+//                    .retrieve()
+//                    .bodyToMono(Movie.class)
+//                    .block();
+            Movie movie = restTemplate.getForObject("http://movie-info-service//movies/" + rating.getMovieId(), Movie.class);
 
             return new CatalogItem(movie.getName(), "This is movie about secret society fo american buisnismens...", rating.getRating());
         }).collect(Collectors.toList());
